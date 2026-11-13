@@ -1188,6 +1188,210 @@ rise|rising star|STAR|An up-and-comer`;
   H2('heads I win', 'HEAD+S @eye WIN', 'Coin toss call', 'heads i win tails you lose', 'HEADS + EYE + WIN');
   // Puzzles bumped by the animated set go to the back of batch 2.
   displaced.forEach(([t, pz]) => pools[t].push(pz));
+
+  /* ---------------------------------------------------------------
+     10. DIFFICULTY TUNING 2  (November 2026)
+     Texting-style spellings (SK8, XLNT, 2GETHER) and picture sums that
+     simply name the answer were still too easy. They're retired and
+     their batch-1 slots are refilled IN PLACE, so the batch sizes and
+     every day's position stay the same:
+       • new puzzles inspired by classic rebus sheets, drawn in
+         Rebusday's own style
+       • single-effect puzzles moved down from batch 2 of Tricky
+     The batch-2 Starter picture sums are dropped for the same reason.
+     --------------------------------------------------------------- */
+  const P = (a, g, h, alt, why) =>
+    ({ a, g, h, alt: alt ? alt.split(',').map(x => x.trim()).filter(Boolean) : [], why: why || '' });
+  const end1 = t => marks[t][0];
+  const idx = (t, a) => pools[t].findIndex(p => p.a === a);
+  const bumped = [];
+  // Put `pz` in the batch-1 slot held by `old`. With keepOld, the old
+  // puzzle moves to the back of batch 2 instead of being retired.
+  const put = (t, old, pz, keepOld) => {
+    const i = idx(t, old);
+    if (!pz || i < 0 || i >= end1(t)) return console.warn('[Rebusday] tuning 2: not in batch 1', t, old);
+    const was = pools[t][i];
+    pools[t][i] = pz;
+    have.add(pz.a.toLowerCase());
+    if (keepOld) bumped.push([t, was]); else have.delete(was.a.toLowerCase());
+  };
+  // Lift a puzzle out of batch 2 so it can fill a batch-1 slot.
+  const lift = (t, a) => {
+    const i = idx(t, a);
+    if (i < end1(t)) { console.warn('[Rebusday] tuning 2: not in batch 2', t, a); return null; }
+    return pools[t].splice(i, 1)[0];
+  };
+  // Give an existing puzzle a cleverer layout (same answer, same day).
+  const redraw = (t, a, g, why) => {
+    const p = pools[t][idx(t, a)];
+    if (!p) return console.warn('[Rebusday] tuning 2: redraw not found', t, a);
+    p.g = g; if (why) p.why = why;
+  };
+
+  // Starter: new puzzles
+  put('easy', 'flashlight', P('lemonade', 'LEM\nADE', 'Summer stand drink', '', 'LEM on ADE'));
+  put('easy', 'streetlight', P('good-looking', 'G+@eye+@eye+D', 'Handsome', 'good looking,goodlooking', 'GOOD, with its Os looking at you'));
+  put('easy', 'lighthouse', P('apple pie', '@apple 3.14', 'As American as...', 'applepie', 'APPLE + π (3.14)'));
+  put('easy', 'moonlight', P('up to you', 'UP U U', 'Your call', "it's up to you,its up to you,up 2 u", 'UP + two Us'));
+  put('easy', 'light rain', P('engineer', 'ENGINE @ear', 'Builds bridges and machines', 'engineers', 'ENGINE + EAR'));
+  put('easy', 'eye candy', P('time to go', '@clock GO GO', "Let's head off", "it's time to go,time 2 go", 'CLOCK (time) + two GOs'));
+  put('easy', 'egghead', P('bookcase', 'CA+@book+SE', 'Shelves for your library', 'book case', 'BOOK in CASE'));
+  put('easy', 'buttercup', P('overweight', '5KG\n---\nWEIGHT', 'Tipping the scales', 'over weight,over-weight', '5kg over WEIGHT'));
+
+  // Starter: single-effect puzzles moved down from Tricky batch 2
+  [
+    ['firefly', 'red herring'], ['bluebell', 'grey area'], ['footnote', 'purple patch'], ['watchdog', 'box office'],
+    ['honeymoon', 'boxed in'], ['bedtime', 'inner circle'], ['leaflet', 'come full circle'], ['jigsaw', 'ring road'],
+    ['skate', 'ring of fire'], ['wait', 'break the ice'], ['often', 'turn the tables'], ['tennis', 'upside down'],
+    ['kitten', 'upset stomach'], ['mitten', 'drop the ball'], ['attention', 'fall flat'], ['written', 'falling apart'],
+    ['wonderful', 'raise the roof'], ['together', 'heatwave'], ['tomorrow', 'ringtone'], ['toucan', 'let down'],
+    ['tulip', 'calm down'], ['forecast', 'hands down'], ['forehead', 'step up'], ['fortune', 'tied up'],
+    ['forbid', 'butter up'], ['forest', 'lie down'], ['excel', 'side effects'], ['excellent', 'off balance'],
+    ['energy', 'stand tall'], ['icy', 'stretch the truth'], ['empty', 'flat tyre'], ['cutie', 'growing concern'],
+    ['decay', 'small print'], ['essay', 'little sister'], ['excess', 'a big ask'], ['exit', 'shortcut'],
+    ['expert', 'high hopes'], ['tepee', 'high and dry'], ['ivy', 'low profile'], ['deviate', 'top ten'],
+    ['rebate', 'top hat'], ['tender', 'online'], ['tea for two', 'beeline'], ['barbecue', 'paper-thin'],
+    ['seashell', 'bold move'], ['seasick', 'fade away'], ['seagull', 'out of focus'], ['teapot', 'strike out'],
+    ['I see you', 'no comment'], ['wok', 'cancelled flight'], ['daisy', 'outline'], ['canine', 'back to front'],
+    ['canoe', 'tunnel vision'],
+  ].forEach(([old, a]) => put('easy', old, lift('medium', a)));
+
+  // Starter batch 2: drop the plain picture sums
+  const SUMS = new Set(['catfish', 'starfish', 'sunglasses', 'moonwalk', 'keyhole', 'earthworm', 'stepladder', 'bedrock',
+    'sweetheart', 'bow tie', 'football', 'mailbox', 'pinball', 'fireball', 'balloon', 'bookworm', 'snail mail',
+    'carpool', 'housefly', 'eggcup', 'the White House', 'lightbulb', 'eyeball']);
+  pools.easy = pools.easy.filter((p, i) => {
+    if (i < end1('easy') || !SUMS.has(p.a)) return true;
+    have.delete(p.a.toLowerCase());
+    return false;
+  });
+
+  // Tricky: new puzzles replace freebies
+  put('medium', 'hot plate', P('forget it', 'GET~IT\nGET~IT\nGET~IT\nGET~IT', 'Never mind!', 'forget about it', 'Four (for) GET ITs'));
+  put('medium', 'I forget', P('eye shadow', 'EYE\nEYE[blur,gray]', 'Make-up for your lids', 'eyeshadow', 'EYE, with its shadow underneath'));
+  put('medium', 'easy as pie', P('tuna fish', 'NAFISH\nNAFISH', 'Sandwich filling from a can', 'tunafish,tuna', 'Two (tu) NAFISH'));
+  put('medium', 'wave goodbye', P('Robin Hood', 'HO+ROB[red,sm]+OD', 'Steals from the rich', '', 'ROB in HOOD'));
+  put('medium', 'bonfire', P('thunderstorm', 'STORM\n---\nTH', 'Flashes and rumbles', 'thunder storm', 'TH under STORM'));
+
+  // Brain-bender: new puzzles; the simpler ones they replace move to batch 2
+  put('hard', 'keep an eye on it', P('trip around the world', 'T\nP @earth R\nI', 'Globetrotting adventure', 'trip round the world,round the world trip,around the world trip', 'T-R-I-P around the WORLD'), true);
+  put('hard', 'be on time', P('love at first sight', '@heart SIGHT[red] SIGHT SIGHT', 'Instant attraction', 'love at 1st sight', 'LOVE at the first SIGHT'), true);
+  put('hard', 'a night on the town', P('look me in the eye', 'E+LOOK~ME[blue,sm]+YE', 'Be honest with me', 'look me in the eyes', 'LOOK ME inside EYE'), true);
+
+  // New puzzles for batch 2
+  const M3 = B('medium');
+  // swap() in section 8 retired these answers without freeing them.
+  ['potatoes', 'comfortable'].forEach(a => { if (!Object.values(pools).flat().some(p => p.a === a)) have.delete(a); });
+  M3('potatoes', 'POT O+O+O+O+O+O+O+O', 'Mash them, bake them, fry them', 'potato', 'POT + eight Os');
+  M3('thanks a lot', 'THANKS THANKS\nTHANKS THANKS\nTHANKS THANKS\nTHANKS THANKS', 'Cheers, really!', 'many thanks,thanks a million,thanks a bunch,lots of thanks', 'A lot of THANKS');
+  M3('comfortable', 'COME\nTABLE TABLE\nTABLE TABLE', 'Snug and cosy', '', 'COME + four (for) TABLEs');
+  M3('headquarters', 'HEAD\nHEAD\nHEAD\nHEAD', "The company's main base", 'head quarters,hq', 'Four HEADs (HEAD quarters)');
+  M3('rain check', '@cloud\nCHECK[sm,fall] CHECK[sm,fall] CHECK[sm,fall]', "Let's do it another time", 'raincheck,take a rain check', 'CHECKs raining from a cloud');
+  bumped.splice(0).forEach(([t, pz]) => pools[t].push(pz));
+
+  // Cleverer layouts for puzzles already in the bank
+  redraw('medium', 'foreign language', 'LANG+4[blue]+UAGE', '4 (for) in LANGUAGE');
+  redraw('medium', '3D movie', 'D~MOVIE\nD~MOVIE\nD~MOVIE', 'Three D MOVIEs');
+  redraw('medium', 'excuse me', 'X+Q+Q+Q+Q+ME', 'X (ex) + Qs (cues) + ME');
+  redraw('easy', 'seesaw', 'ATLANTIC[sm] PACIFIC[sm] SAW', 'SEAs SAW');
+
+  /* ---------------------------------------------------------------
+     11. CLASSIC SHEETS, PART 2  (November 2026)
+     More puzzles inspired by classic rebus sheets, several using the
+     November doodles (bag, drum, eagle, ray, lion, scales, rock, roll,
+     table, paw, mouse, anchor). Each takes an upcoming batch-1 slot so
+     it turns up soon; the plainer puzzle it replaces moves to the back
+     of batch 2, so nothing is lost and no played day changes.
+     --------------------------------------------------------------- */
+  // Starter
+  put('easy', 'small town', P('tea bag', 'T @bag', 'Dunk it in hot water', 'teabag', 'T + BAG'), true);
+  put('easy', 'blueprint', P('X-ray', 'X @ray', 'See right through you', 'xray,x ray', 'X + RAY'), true);
+  put('easy', 'lowlife', P('sunroof', '@sun\n@house', 'Let the light into the car', 'sun roof', 'SUN on the roof'), true);
+  put('easy', 'split second', P('doghouse', 'HO+@paw+USE', "Where you are when you're in trouble", 'dog house', 'HOUSE with a paw print'), true);
+  put('easy', 'grown-up', P('broken man', 'MAN[scatter]', 'Shattered by bad news', '', 'MAN, broken'), true);
+  put('easy', 'green light', P('seahorse', '@wave HORSE', 'Dad carries the babies', 'sea horse', 'SEA (see) + HORSE'), true);
+  put('easy', 'blue cheese', P('honeybee', '@honey B', 'Makes the sweet stuff', 'honey bee', 'HONEY + B'), true);
+  put('easy', 'thin crust', P('heartbeat', '@heart @drum', 'Pulse', 'heart beat', 'HEART + drum BEAT'), true);
+  put('easy', 'pink slip', P('caveman', 'CA+@man+VE', 'Stone Age dweller', 'cave man', 'MAN in CAVE'), true);
+  put('easy', 'brown bag', P('catwalk', 'CAT\n@shoe[crawl] @shoe[crawl]', 'Where models strut', 'cat walk', 'CAT + WALKing shoes'), true);
+
+  // Tricky
+  put('medium', 'crossed wires', P('advice', 'VICE ＋ VICE', 'Words of wisdom', '', 'Add VICE'), true);
+  put('medium', 'unfinished business', P('illegal', 'ILL @eagle', 'Against the law', '', 'ILL + EAGLE'), true);
+  put('medium', 'tyrant', P('rock and roll', '@rock N @roll', 'Elvis made it famous', "rock 'n' roll,rock n roll,rock & roll,rocknroll", 'ROCK + N + ROLL'), true);
+  put('medium', 'caught red-handed', P('weather', '@scales+THER', 'Sunny, rainy or snowy', '', 'WEIGH (scales) + THER'), true);
+  put('medium', 'wavelength', P('mousetrap', 'TRA+@mouse+P', 'Baited with cheese', 'mouse trap', 'MOUSE in a TRAP'), true);
+  put('medium', 'sausage', P('turnip', '@arrow[spin] IP', 'Root vegetable', 'turnips', 'TURN + IP'), true);
+  put('medium', 'rock bottom', P('pardon me', 'PARD\nME', 'Excuse me?', 'pardon', 'PARD on ME'), true);
+  put('medium', 'split hairs', P('French fries', 'FRANCE @pan', 'Served with ketchup', 'french fry,fries,chips', 'FRANCE (French) + frying PAN'), true);
+  put('medium', 'cup of tea', P('wild animal', 'A[tilt] N[mirror] I[xl] M[flip] A[red] L[sm]', 'Not a pet', 'wild animals', 'ANIMAL, gone wild'), true);
+  put('medium', 'black hole', P('Cuba', 'Q BAA', 'Caribbean island nation', '', 'Q + BAA'), true);
+  put('medium', 'cross-section', P('hairdresser', 'HARE DRESSER', 'Cuts and styles', 'hair dresser,hairdressers', 'HARE + DRESSER'), true);
+  put('medium', 'springtime', P('laundromat', 'LAWN+D ROW MAT', 'Do your washing here', 'laundrette,launderette', 'LAWN + D + ROW + MAT'), true);
+  put('medium', 'appear', P("I'll get over it", "I'LL GET\n---\nIT", 'Moving on', 'ill get over it,i will get over it,get over it', "I'LL GET over IT"), true);
+  put('medium', 'delight', P('fishing hook', 'FISH[fall]+ING[vup]', 'Bait goes on it', 'fish hook,fishhook,hook', 'FISHING, bent into a hook'), true);
+
+  // Brain-bender
+  put('hard', 'lean on me', P('forty-two years', 'T+T+T+T YEARS YEARS', 'Over four decades', '42 years,forty two years', 'Four Ts (forty) + two YEARS'), true);
+  put('hard', 'down to earth', P('walking in the woods', 'THE W+KING[red,sm]+OODS', 'A stroll among the trees', 'walk in the woods,walking in the wood', 'W-KING (walking) in the WOODS'), true);
+  put('hard', 'kingfisher', P('electric blanket', 'EL+~[box]+C+~[box]+RIC', 'Keeps the bed warm', '', 'ELECTRIC with a blank E and T'), true);
+  put('hard', 'eye of the storm', P('come into season', 'COME\n@arrow[side]\nSPRING SUMMER\nAUTUMN WINTER', 'Ready to harvest', 'in season,coming into season', 'COME into the SEASONs'), true);
+  put('hard', 'pie in the sky', P('Eiffel Tower', '@eye FULL TOW+ER', 'Paris landmark', 'the eiffel tower', 'EYE + FULL + TOW + ER'), true);
+  put('hard', 'hand in hand', P('Micronesia', 'MIC ROW KNEE SIA', 'Pacific island nation', '', 'MIC + ROW + KNEE + SIA'), true);
+  put('hard', 'to see stars', P('Angkor Wat', '@anchor WHAT?', 'Cambodian temple', 'angkor what', 'ANCHOR + WHAT'), true);
+  bumped.splice(0).forEach(([t, pz]) => pools[t].push(pz));
+
+  redraw('easy', 'uproar', 'UP\n@lion', 'UP + ROAR (lion)');
+  redraw('easy', 'lovebirds', '@heart[sm]+BIRDS+@heart[sm]', 'BIRDS in LOVE');
+  redraw('hard', 'underdogs', '@table\n@dog @dog', 'DOGS under the table');
+
+  /* ---------------------------------------------------------------
+     12. CLASSIC SHEETS, PART 3  (November 2026)
+     Same approach as section 11. New doodles: scissors, rooster.
+     --------------------------------------------------------------- */
+  // Starter
+  put('easy', 'round table', P('microscope', 'SCOPE[xs]', 'Lab lens for tiny things', '', 'A tiny (micro) SCOPE'), true);
+  put('easy', 'white noise', P('blanket', '~~~~~~[uline]+ET', 'Keeps you warm in bed', 'blankets', 'BLANK + ET'), true);
+  put('easy', 'sit down', P('fly screen', 'SCREEN[fly]', 'Keeps the bugs out', 'flyscreen,fly screens', 'SCREEN, flying'), true);
+  put('easy', 'backstroke', P('unbroken', 'UN[scatter]', 'Still in one piece', '', 'UN, broken'), true);
+  put('easy', 'highland', P('cattle', '@cat ILL', 'Herd on the farm', '', 'CAT + ILL'), true);
+  put('easy', 'falling star', P('horsefly', 'HORSE[fly]', 'Biting insect', 'horse fly', 'HORSE, flying'), true);
+  put('easy', 'tall order', P('shoplift', 'SHOP[rising]', 'Steal from a store', 'shoplifting', 'SHOP, lifting'), true);
+  put('easy', 'long shot', P('seasoning', '@wave+SON+ING', 'Salt and pepper', '', 'SEA + SON + ING'), true);
+
+  // Tricky
+  put('medium', 'a bone to pick', P('one night stand', 'ONE KNIGHT\nST&', 'A single performance', 'one-night stand', 'ONE + KNIGHT (night) + ST& (stand)'), true);
+  put('medium', 'time warp', P('eye sockets', '@eye SOCK+ET\n@eye SOCK+ET', 'Where your peepers sit', 'eye socket', 'EYE + SOCK + ET, twice'), true);
+  put('medium', 'copycat', P('neighbourhood', 'NEIGH BORE HOOD', 'Where you live', 'neighborhood', 'NEIGH + BORE + HOOD'), true);
+  put('medium', "time's up", P('failure', 'FALL[fall] LURE', 'Opposite of success', 'a failure', 'FALL + LURE'), true);
+  put('medium', 'icing', P('cut corners', '@scissors CORNER CORNER', 'Skimp to save time', 'cutting corners,cut corner', 'CUT (scissors) + CORNERS'), true);
+  put('medium', 'fat chance', P('cocktail', '@rooster TALE', 'Mixed drink with an umbrella', 'cocktails', 'COCK + TALE'), true);
+  put('medium', 'breaking point', P('summary', 'MARY\n＋~MARY\n---', 'The short version', '', 'SUM of MARYs'), true);
+  put('medium', 'blue in the face', P('bad influence', 'FLU+BAD[red]+ENCE', 'Leads you astray', '', 'BAD in FLUENCE'), true);
+  put('medium', 'growing old', P('sunken', 'KENKENKENKENKEN[ring,orange]', 'Below the surface, like a wreck', 'sunk', 'KENs in the shape of a SUN'), true);
+  put('medium', 'man overboard', P('wise guy', 'Y Y Y GUY', 'Smart alec', 'wiseguy', 'Ys (wise) + GUY'), true);
+  put('medium', 'watch your step', P('crystallize', 'CRYSTAL @eye @eye', 'Turn into a gem-like solid', 'crystallise,crystalize', 'CRYSTAL + EYES'), true);
+  put('medium', 'falling behind', P('foul language', 'GOBBLE CLUCK\nHONK QUACK', 'Mind your mouth!', 'bad language,fowl language', 'FOWL language'), true);
+  put('medium', 'sinking feeling', P('summer', 'R ＋ R =', 'Season of long days', '', 'SUM of Rs (SUM-R)'), true);
+  put('medium', 'tidy', P('four seasons', '@wave+SON @wave+SON\n@wave+SON @wave+SON', "Vivaldi's best-known work", 'the four seasons,4 seasons', 'Four SEA SONs'), true);
+  put('medium', 'growing economy', P('mutate', 'MUTE MUTE\nMUTE MUTE\nMUTE MUTE\nMUTE MUTE', 'Change form, X-Men style', 'mutation', 'MUTE eight (ate)'), true);
+  put('medium', 'the bottom line', P('pecan nuts', '@pea @can NUTS', 'Pie filling from a hickory tree', 'pecans,pecan,pecan nut', 'PEA + CAN + NUTS'), true);
+  put('medium', 'parent', P('karaoke', '@car+RY OK', 'Sing along to the screen', '', 'CARRY + OK'), true);
+  put('medium', 'parallel parking', P('easel', 'EZ+L', "Holds an artist's canvas", 'easels', 'EZ (ease) + L'), true);
+  put('medium', 'the early bird', P('discount', 'DIS 1 2 3', 'Money off', 'discounts', 'DIS + COUNT (1 2 3)'), true);
+  put('medium', 'tiger', P('fortunate', '4 TUNA 8', 'Lucky', 'fortunately', '4 + TUNA + 8 (ate)'), true);
+
+  // Brain-bender
+  put('hard', 'a step backwards', P('stay indoors', 'DO+STAY[blue]+ORS', "Don't go out", 'stay inside,stay in doors', 'STAY in DOORS'), true);
+  put('hard', 'egg on your face', P('New Zealand', 'NEWS EEL &', 'Land of the long white cloud', '', 'NEWS + EEL + AND'), true);
+  put('hard', 'king of the hill', P('Indian food', 'DI+FOOD[blue]+AN', 'Curry and naan', 'indian cuisine', 'FOOD in DIAN'), true);
+  put('hard', 'repeat after me', P('coloring', 'RED[red] BLUE[blue]\nGREEN[green] PURPLE[purple]\n@ring', 'Crayons and a picture book', 'colouring,for coloring,for colouring,coloring in,colouring in', 'Four (for) COLOR + RING'), true);
+  bumped.splice(0).forEach(([t, pz]) => pools[t].push(pz));
+
+  redraw('medium', 'headquarters', '25%\nHEAD\n25%', 'HEAD + quarters (25%)');
+  redraw('medium', 'tennis shoes', 'ISSUES ISSUES\nISSUES ISSUES\nISSUES ISSUES\nISSUES ISSUES\nISSUES ISSUES', 'Ten ISSUES');
+  redraw('easy', 'teacup', 'TEA+C\n.\n.\n.', 'TEA + C, up top');
+
   delete window.__REBUS_PROMOTE__;
   mark();
   window.REBUS_BATCHES = marks;
