@@ -213,6 +213,7 @@ body.on-start { overflow: hidden; }
 .start-tag { margin: 0 0 14px; font-size: 20px; color: var(--paper-ink); }
 .start-date { margin: 0; font: 400 20px/1.2 var(--hand); color: var(--paper-ink); }
 .start-status { margin: 4px 0 18px; font-size: 17px; color: #6d7488; min-height: 1.3em; }
+.start-status .streak-fire { width: 1.6em; height: 1.6em; vertical-align: -.42em; margin-right: -.1em; }
 .start-actions { display: grid; gap: 12px; }
 .start-play { font-size: 26px; padding: 14px 20px; }
 .start-actions .btn.ghost { background: var(--sheet); color: var(--paper-ink); border-color: var(--paper-ink); }

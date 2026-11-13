@@ -949,16 +949,25 @@
     const streak = s.last != null && s.last >= d - 1 ? s.streak : 0;
     const started = state.p.some(p => p.go || p.status !== 'playing' || p.wrong.length || p.hints);
     const play = $('#startPlay'), status = $('#startStatus');
+    // Streak text with the hand-drawn fire doodle instead of an emoji.
+    const streakLine = (before, after) => {
+      status.textContent = before;
+      const fire = doodleEl('fire');
+      if (fire) { fire.classList.add('streak-fire'); status.append(fire); }
+      status.append(` ${streak}-day streak${after}`);
+    };
     if (dayDone()) {
       play.textContent = 'See today’s results';
-      status.textContent = `Done for today: ${dayScore()} / 1000` + (streak ? ` · 🔥 ${streak}-day streak` : '');
+      if (streak) streakLine(`Done for today: ${dayScore()} / 1000 · `, '');
+      else status.textContent = `Done for today: ${dayScore()} / 1000`;
     } else if (started) {
       const left = state.p.filter(p => p.status === 'playing').length;
       play.textContent = 'Continue';
       status.textContent = `${dayScore()} pts so far · ${left} puzzle${left > 1 ? 's' : ''} to go`;
     } else {
       play.textContent = 'Play';
-      status.textContent = streak ? `🔥 ${streak}-day streak. Keep it going!` : 'The clock starts when you press Play.';
+      if (streak) streakLine('', '. Keep it going!');
+      else status.textContent = 'The clock starts when you press Play.';
     }
     const left = practiceLeft();
     const warm = $('#startWarm');
