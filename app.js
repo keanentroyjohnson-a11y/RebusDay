@@ -338,31 +338,14 @@
   const refitAll = () => document.querySelectorAll('.stage').forEach(fit);
 
   /* ======================= ANSWER CHECKING ====================== */
-  const ARTICLES = new Set(['a', 'an', 'the']);
+  // Only the exact answer counts. Case, spacing and punctuation are ignored
+  // ("Back-Fire" = "backfire"), but synonyms, extra words and near-misses
+  // are wrong guesses and cost a life.
   function norm(s) {
     return s.toLowerCase()
       .replace(/&/g, ' and ')
-      .replace(/['’`]/g, '')
-      .replace(/[^a-z0-9]+/g, ' ')
-      .trim()
-      .split(' ')
-      .filter(w => w && !ARTICLES.has(w))
-      .join('');
+      .replace(/[^a-z0-9]+/g, '');
   }
-  function lev(a, b) {
-    if (Math.abs(a.length - b.length) > 3) return 99;
-    const dp = Array.from({ length: b.length + 1 }, (_, i) => i);
-    for (let i = 1; i <= a.length; i++) {
-      let prev = dp[0]; dp[0] = i;
-      for (let j = 1; j <= b.length; j++) {
-        const tmp = dp[j];
-        dp[j] = Math.min(dp[j] + 1, dp[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
-        prev = tmp;
-      }
-    }
-    return dp[b.length];
-  }
-  const accepted = pz => [pz.a, ...pz.alt].map(norm);
 
   /* ========================== STATE ============================= */
   const fresh = () => ({ wrong: [], hints: 0, status: 'playing', ms: 0, run: null, go: false });
@@ -569,12 +552,8 @@
     const g = norm(raw);
     if (!g) return;
     clockStart();
-    const ok = accepted(pz);
-    if (ok.includes(g)) return resolve('solved');
+    if (g === norm(pz.a)) return resolve('solved');
     if (ps.wrong.some(w => norm(w) === g)) { toast('Already tried that one'); return; }
-    const target = ok[0];
-    const tol = target.length >= 10 ? 2 : target.length >= 5 ? 1 : 0;
-    if (tol && ok.some(a => lev(g, a) <= tol)) { toast('So close! Check your spelling'); return; }
 
     ps.wrong.push(raw);
     formEl.classList.remove('shake'); void formEl.offsetWidth; formEl.classList.add('shake');
