@@ -1405,4 +1405,19 @@ rise|rising star|STAR|An up-and-comer`;
   });
 
   window.REBUS_POOLS = pools;
+
+  /* ---------------------------------------------------------------
+     WARM-UPS: the same five puzzles every time, one per mechanic.
+     They're retired puzzles that are NOT in any daily pool, so
+     warming up can never spoil a future day. Keep it that way.
+     --------------------------------------------------------------- */
+  const WARMUPS = [
+    P('keyhole', '@key @hole', 'Peek through it', '', 'KEY + HOLE'),
+    P('egghead', '@egg HEAD', 'Brainy person', '', 'EGG + HEAD'),
+    P('White House', 'HOUSE[white]', '1600 Pennsylvania Avenue', '', 'HOUSE in white'),
+    P('hot plate', '@fire PL8', 'Cooking ring', '', 'HOT + PL-8 (plate)'),
+    P('easy as pie', 'EZ AS @pie', 'No trouble at all', '', 'EZ (easy) + AS + PIE'),
+  ];
+  WARMUPS.forEach(w => { if (seen.has(w.a.toLowerCase())) console.warn('[Rebusday] warm-up is also a daily puzzle:', w.a); });
+  window.REBUS_WARMUPS = WARMUPS;
 })();

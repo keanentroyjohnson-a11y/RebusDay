@@ -718,24 +718,19 @@
       return;
     }
     if (mode === 'daily') { clockPause(state.p[cur]); saveDaily(); }
-    const todays = new Set(puzzlesForDay(todayIndex()).map(p => p.a));
     mode = 'practice';
     puzzles = []; state = { p: [] };
-    practiceExclude = todays;
     $('#practiceBanner').hidden = false;
     $('#steps').hidden = true;
     $('#dayLabel').textContent = 'Warm-up round';
     addPractice();
     show(0);
   }
-  let practiceExclude = new Set();
   // Practice puzzles are a fixed set for each day (seeded by the date), so
   // after a reset the same practice puzzles come round again in the same order.
-  function practiceSet() {
-    const todays = new Set(puzzlesForDay(todayIndex()).map(p => p.a));
-    const all = Object.values(POOLS).flat().filter(p => !todays.has(p.a));
-    return shuffle(all, rng(hash('rebusday|practice|' + todayIndex()))).slice(0, PRACTICE_LIMIT);
-  }
+  // Always the same five warm-ups, kept out of the daily pools so they
+  // can't spoil a future day (see REBUS_WARMUPS in puzzles.js).
+  const practiceSet = () => window.REBUS_WARMUPS || [];
   function addPractice() {
     const list = practiceSet();
     const pz = list[Math.min(practiceUsed(), list.length - 1)];
